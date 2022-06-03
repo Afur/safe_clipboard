@@ -65,6 +65,8 @@ class SafeClipboardPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             // the toast doesn't show on lower versions.
             if (Build.VERSION.SDK_INT >= 31) {
                 val desiredMimeTypeName = call.argument<String?>("AndroidClipMimeType")
+                val confidentScoreCheckValue = call.argument<String?>("AndroidConfidentScoreValue")
+
                 desiredMimeTypeName?.let {
                     val clipDescription = clipboard.primaryClipDescription
                     val mimeType = clipDescription?.getMimeType(0)
@@ -83,6 +85,18 @@ class SafeClipboardPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                         return
                     }
                 }
+
+                confidentScoreCheckValue?.let {
+                    val confidentScore = clipboard.primaryClipDescription?.getConfidenceScore(confidentScoreCheckValue)
+
+                    confidentScore?.let {
+                        if(confidentScore < 0.6f) {
+                            result.success(null)
+                            return
+                        }
+                    }
+                }
+
             }
 
             // Get and return the clip data as a string

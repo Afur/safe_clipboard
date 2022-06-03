@@ -12,6 +12,10 @@ class SafeClipboard {
   ///
   /// On Android you can pass in a specific [AndroidClipMimeType] to avoid accessing
   /// the clipboard if the current clipboard data is not relevant to your app.
+  /// 
+  /// On Android you can also pass [androidConfidentScoreValue] to check
+  /// how confident it is that the string exist in clipboard. 
+  /// The value from clipboard is returned when the score is above 0.6
   ///
   /// This is used to avoid the system notification for clipboard access. Read
   /// more about this at the links below.
@@ -21,12 +25,14 @@ class SafeClipboard {
   static Future<String?> get({
     iOSDetectionPattern? iOSDetectionPattern,
     AndroidClipMimeType? androidClipMimeType,
+    String? androidConfidentScoreValue,
   }) async {
     final String? value = await _channel.invokeMethod(
       'getClipboardTextSafe',
       {
         'iOSDetectionPattern': iOSDetectionPattern?.name,
         'AndroidClipMimeType': androidClipMimeType?.name,
+        'AndroidConfidentScoreValue': androidConfidentScoreValue,
       },
     );
     return value;
